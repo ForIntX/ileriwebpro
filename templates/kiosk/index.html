@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hastane Kiosk Sistemi</title>
+  <meta name="description" content="Hastane kiosk sistemi - sıra alın ve poliklinik hizmetlerinden yararlanın.">
+  <link rel="stylesheet" href="{% static 'css/kiosk.css' %}">
+</head>
+<body>
+<div class="kiosk-page">
+
+  <!-- Header -->
+  <header class="kiosk-header">
+    <div class="logo-icon">🏥</div>
+    <div class="kiosk-header-text">
+      <h1>Hastane Kiosk Sistemi</h1>
+      <span class="subtitle">Hoş geldiniz — Lütfen bir seçenek yapınız</span>
+    </div>
+    <div class="header-time">
+      <div class="time" id="kiosk-clock">--:--</div>
+      <div class="date" id="kiosk-date"></div>
+    </div>
+  </header>
+
+  <!-- Ana İçerik -->
+  <main class="kiosk-main">
+
+    <div class="text-center" style="max-width:640px">
+      <p style="font-size:22px;font-weight:600;color:var(--text-secondary);margin-bottom:8px;">
+        Poliklinik hizmetleri için sıra alın
+      </p>
+      <p style="font-size:16px;color:var(--text-muted);">
+        TC kimlik numaranızı ve poliklinik bilginizi hazır bulundurunuz.
+      </p>
+    </div>
+
+    <!-- Ana Butonlar -->
+    <div class="home-buttons">
+
+      <a href="/kiosk/checkin/" class="btn-kiosk btn-primary-kiosk" id="btn-manual-checkin">
+        <span class="btn-icon">📋</span>
+        <div>
+          <div>Sıra Al</div>
+          <div style="font-size:14px;font-weight:400;opacity:.85">Manuel Giriş</div>
+        </div>
+      </a>
+
+      <a href="/kiosk/qr/" class="btn-kiosk btn-secondary-kiosk" id="btn-qr-checkin">
+        <span class="btn-icon">📷</span>
+        <div>
+          <div>QR ile Giriş</div>
+          <div style="font-size:14px;font-weight:400;opacity:.85">Kimlik kartı okut</div>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- Bilgi Kartı -->
+    <div style="max-width:640px;width:100%">
+      <div class="info-banner">
+        <span style="font-size:22px">ℹ️</span>
+        Lütfen TC kimlik numaranızı hazır bulundurunuz.
+        Sıranız geldiğinde ekranda bildirim alacaksınız.
+      </div>
+    </div>
+
+    <!-- Hızlı Erişim -->
+    <div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;max-width:640px;width:100%">
+      <a href="/panel/display/" 
+         class="btn-kiosk btn-outline-kiosk" 
+         style="min-height:52px;font-size:15px;padding:12px 28px;flex:1;min-width:200px;"
+         id="btn-numarator">
+        📺 Numaratör Ekranı
+      </a>
+      <a href="/panel/" 
+         class="btn-kiosk btn-outline-kiosk" 
+         style="min-height:52px;font-size:15px;padding:12px 28px;flex:1;min-width:200px;"
+         id="btn-doctor-panel">
+        👨‍⚕️ Doktor Paneli
+      </a>
+    </div>
+
+  </main>
+
+  <footer class="kiosk-footer">
+    Hastane Kiosk Sistemi &mdash; Tüm işlemleriniz güvende 🔒
+  </footer>
+
+</div>
+
+<script src="{% static 'js/kiosk.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sıra Al — Kiosk</title>
+  <meta name="description" content="Poliklinik sırası alın — TC kimlik numaranız ve ad soyadınızla hızlı giriş yapın.">
+  <link rel="stylesheet" href="{% static 'css/kiosk.css' %}">
+</head>
+<body>
+<div class="kiosk-page">
+
+  <!-- Header -->
+  <header class="kiosk-header">
+    <div class="logo-icon">🏥</div>
+    <div class="kiosk-header-text">
+      <h1>Sıra Al</h1>
+      <span class="subtitle">Bilgilerinizi girerek sıra numaranızı alın</span>
+    </div>
+    <div class="header-time">
+      <div class="time" id="kiosk-clock">--:--</div>
+      <div class="date" id="kiosk-date"></div>
+    </div>
+  </header>
+
+  <!-- Form -->
+  <main class="kiosk-main">
+    <div style="width:100%;max-width:700px;">
+      <div class="card">
+        <div class="card-body">
+
+          <!-- Genel Hata -->
+          <div id="form-error" class="danger-banner hidden" style="margin-bottom:24px;">
+            <span style="font-size:22px">⚠️</span>
+            <span id="form-error-text"></span>
+          </div>
+
+          <form id="checkin-form" novalidate>
+
+            <!-- TC Kimlik No -->
+            <div class="form-group">
+              <label class="form-label" for="tc_no">
+                TC Kimlik Numarası <span class="required">*</span>
+              </label>
+              <input
+                type="text"
+                id="tc_no"
+                name="tc_no"
+                class="form-control-kiosk"
+                placeholder="11 haneli TC kimlik numaranız"
+                maxlength="11"
+                inputmode="numeric"
+                autocomplete="off"
+                required
+              >
+              <div class="error-msg hidden" id="tc-error"></div>
+            </div>
+
+            <!-- Ad Soyad -->
+            <div class="form-group">
+              <label class="form-label" for="full_name">
+                Ad Soyad <span class="required">*</span>
+              </label>
+              <input
+                type="text"
+                id="full_name"
+                name="full_name"
+                class="form-control-kiosk"
+                placeholder="Adınız ve soyadınız"
+                autocomplete="name"
+                required
+              >
+              <div class="error-msg hidden" id="name-error"></div>
+            </div>
+
+            <!-- Poliklinik -->
+            <div class="form-group">
+              <label class="form-label" for="polyclinic_id">
+                Poliklinik <span class="required">*</span>
+              </label>
+              <select id="polyclinic_id" name="polyclinic_id" class="form-control-kiosk" required>
+                <option value="">— Poliklinik Seçiniz —</option>
+                {% for poly in polyclinics %}
+                  <option value="{{ poly.id }}">{{ poly.name }}{% if poly.floor %} ({{ poly.floor }}){% endif %}</option>
+                {% endfor %}
+              </select>
+              <div class="error-msg hidden" id="poly-error"></div>
+            </div>
+
+            <!-- Doktor (dinamik) -->
+            <div class="form-group hidden" id="doctor-container">
+              <label class="form-label" for="doctor_id">Doktor Seçimi</label>
+              <select id="doctor_id" name="doctor_id" class="form-control-kiosk">
+                <option value="">— Otomatik Atama —</option>
+                {% for doc in doctors %}
+                  <option value="{{ doc.id }}" data-poly="{{ doc.polyclinic_id }}">
+                    Dr. {{ doc.full_name }} — Oda {{ doc.room_number }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- Submit -->
+            <div style="margin-top:32px;">
+              <button
+                type="submit"
+                id="submit-btn"
+                class="btn-kiosk btn-primary-kiosk w-full"
+                disabled
+              >
+                <span class="btn-icon">✓</span>
+                Sıra Numarası Al
+              </button>
+            </div>
+
+          </form>
+
+        </div>
+      </div><!-- /card -->
+
+      <!-- Geri -->
+      <div class="text-center mt-4">
+        <a href="/" class="btn-kiosk btn-outline-kiosk" style="min-height:52px;font-size:16px;padding:12px 32px;">
+          ← Ana Ekrana Dön
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="kiosk-footer">
+    TC kimlik numaranız güvenli şekilde işlenir ve hiçbir zaman görüntülenmez. 🔒
+  </footer>
+
+</div>
+
+<script src="{% static 'js/kiosk.js' %}"></script>
+<script>
+// Poliklinik seçimine göre doktor filtrele
+document.getElementById('polyclinic_id').addEventListener('change', function() {
+  const selected = this.value;
+  const doctorContainer = document.getElementById('doctor-container');
+  const doctorSel = document.getElementById('doctor_id');
+  const options = doctorSel.querySelectorAll('option[data-poly]');
+
+  options.forEach(opt => {
+    opt.style.display = (!selected || opt.dataset.poly === selected) ? '' : 'none';
+  });
+
+  // İlk geçerli seçeneği varsayılan yap
+  doctorSel.value = '';
+  doctorContainer.classList.toggle('hidden', !selected);
+});
+</script>
+</body>
+</html>

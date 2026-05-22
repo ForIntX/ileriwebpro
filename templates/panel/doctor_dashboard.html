@@ -1,0 +1,259 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doktor Paneli{% if doctor %} — Dr. {{ doctor.full_name }}{% endif %}</title>
+  <meta name="description" content="Hastane doktor paneli — hasta listesi, çağırma ve anamnez görüntüleme.">
+  <link rel="stylesheet" href="{% static 'css/panel.css' %}">
+</head>
+<body>
+<div class="panel-layout">
+
+  <!-- Sidebar -->
+  <aside class="panel-sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">🏥</div>
+      <div>
+        <div class="sidebar-logo-text">Hastane Sistemi</div>
+        <div class="sidebar-logo-sub">Doktor Paneli</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-label">Menü</div>
+      <a href="/panel/" class="nav-item active" id="nav-dashboard">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+      <a href="/panel/display/" class="nav-item" id="nav-display">
+        <span class="nav-icon">📺</span> Numaratör Ekranı
+      </a>
+      <a href="/kiosk/checkin/" class="nav-item" id="nav-kiosk">
+        <span class="nav-icon">🖥️</span> Kiosk Ekranı
+      </a>
+
+      <div class="nav-label" style="margin-top:16px;">Doktorlar</div>
+      {% for doc in all_doctors %}
+      <a href="/panel/doctor/{{ doc.id }}/"
+         class="nav-item {% if doctor.id == doc.id %}active{% endif %}"
+         id="nav-doc-{{ doc.id }}">
+        <span class="nav-icon">👨‍⚕️</span>
+        Dr. {{ doc.full_name }}
+        {% if doc.waiting_count %}
+          <span class="badge-count">{{ doc.waiting_count }}</span>
+        {% endif %}
+      </a>
+      {% endfor %}
+    </nav>
+
+    <!-- Doktor Bilgisi -->
+    {% if doctor %}
+    <div class="sidebar-footer">
+      <div class="doctor-info-card">
+        <div class="doctor-avatar">👨‍⚕️</div>
+        <div class="doctor-info-text">
+          <div class="doctor-name">Dr. {{ doctor.full_name }}</div>
+          <div class="doctor-dept">{{ doctor.polyclinic.name }} — Oda {{ doctor.room_number }}</div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </aside>
+
+  <!-- Ana İçerik -->
+  <div class="panel-content">
+
+    <!-- Top Bar -->
+    <div class="panel-topbar">
+      <div class="topbar-title">
+        {% if doctor %}
+          Dr. {{ doctor.full_name }} — {{ doctor.polyclinic.name }}
+        {% else %}
+          Doktor Paneli
+        {% endif %}
+      </div>
+      <div class="topbar-actions">
+        <span style="font-size:13px;color:var(--text-muted);">
+          🔄 Her 10 saniyede güncellenir
+        </span>
+        <a href="/panel/display/" class="btn btn-outline btn-sm" id="btn-open-display">
+          📺 Numaratör
+        </a>
+      </div>
+    </div>
+
+    <!-- Panel Gövdesi -->
+    <div id="doctor-panel"
+         data-doctor-id="{{ doctor.id|default:'' }}">
+
+      <!-- İstatistikler -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon blue">⏳</div>
+          <div>
+            <div class="stat-value" id="stat-waiting">{{ stats.waiting }}</div>
+            <div class="stat-label">Bekleyen</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon amber">📢</div>
+          <div>
+            <div class="stat-value" id="stat-called">{{ stats.called }}</div>
+            <div class="stat-label">Çağrılan</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">✅</div>
+          <div>
+            <div class="stat-value" id="stat-completed">{{ stats.completed }}</div>
+            <div class="stat-label">Tamamlanan</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon purple">📋</div>
+          <div>
+            <div class="stat-value">{{ stats.total }}</div>
+            <div class="stat-label">Toplam (bugün)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Çağrılan Hasta Bölümü -->
+      <div class="section">
+        <div class="section-title">
+          <span>📢</span> Şu An Çağrılan Hasta
+        </div>
+
+        <div id="called-section" class="{% if not called_patient %}hidden{% endif %}">
+          <div class="called-patient-card">
+            <div>
+              <div style="font-size:13px;opacity:.7;margin-bottom:4px;">SIRA NO</div>
+              <div class="called-queue-number" id="called-queue-num">
+                {% if called_patient %}{{ called_patient.queue_number }}{% endif %}
+              </div>
+            </div>
+            <div class="called-info">
+              <h3 id="called-patient-name">{% if called_patient %}{{ called_patient.patient.full_name }}{% endif %}</h3>
+              <p>Oda: <strong id="called-room">{% if called_patient and called_patient.doctor %}{{ called_patient.doctor.room_number }}{% else %}—{% endif %}</strong></p>
+              {% if called_patient and called_patient.called_at %}
+              <p style="margin-top:4px;font-size:12px;opacity:.6;">
+                Çağrılma: {{ called_patient.called_at|time:"H:i" }}
+              </p>
+              {% endif %}
+            </div>
+            {% if called_patient and called_patient.anamnez_summary %}
+            <div class="called-anamnez{% if called_patient.risk_detected %} risk{% endif %}"
+                 id="called-anamnez">
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:.7;margin-bottom:6px;">
+                Anamnez Özeti
+                {% if called_patient.risk_detected %}
+                  <span style="color:#fca5a5;">⚠ Risk</span>
+                {% endif %}
+              </div>
+              {{ called_patient.anamnez_summary }}
+            </div>
+            {% else %}
+            <div class="called-anamnez" id="called-anamnez">
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:.5;margin-bottom:6px;">Anamnez Özeti</div>
+              <span style="opacity:.5">Anamnez bulunmuyor.</span>
+            </div>
+            {% endif %}
+            <div class="called-actions">
+              <button class="btn btn-success btn-lg" id="btn-complete">✅ Tamamlandı</button>
+              <button class="btn btn-danger"  id="btn-cancel">✖ İptal</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Çağrılmış hasta yoksa -->
+        <div id="no-called-msg" class="{% if called_patient %}hidden{% endif %}"
+             style="color:var(--text-muted);font-size:15px;padding:20px 0;">
+          Şu an çağrılan hasta bulunmuyor.
+        </div>
+      </div>
+
+      <!-- Sonraki Hasta Çağır -->
+      <div class="section" style="padding-top:0;">
+        <button class="btn btn-primary btn-lg" id="btn-call-next">
+          📢 Sonraki Hastayı Çağır
+        </button>
+      </div>
+
+      <!-- Bekleyen Hastalar -->
+      <div class="section">
+        <div class="section-title">
+          <span>⏳</span> Bekleyen Hastalar
+          <span id="waiting-count-badge"
+                class="badge-count"
+                style="background:var(--primary)">
+            {{ stats.waiting }}
+          </span>
+        </div>
+
+        <div class="panel-card">
+          <div id="no-patients-msg"
+               class="empty-state {% if waiting_patients %}hidden{% endif %}">
+            <div class="empty-state-icon">🎉</div>
+            <p>Bekleyen hasta bulunmuyor.</p>
+          </div>
+
+          <table class="data-table" id="waiting-table"
+                 {% if not waiting_patients %}style="display:none"{% endif %}>
+            <thead>
+              <tr>
+                <th>Sıra No</th>
+                <th>Hasta Adı</th>
+                <th>Giriş Saati</th>
+                <th>Anamnez Özeti</th>
+                <th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody id="waiting-table-body">
+              {% for entry in waiting_patients %}
+              <tr {% if entry.risk_detected %}class="risk-row"{% endif %}>
+                <td><strong>#{{ entry.queue_number }}</strong></td>
+                <td>{{ entry.patient.full_name }}</td>
+                <td style="color:var(--text-secondary);font-size:13px;">
+                  {{ entry.created_at|time:"H:i" }}
+                </td>
+                <td style="font-size:13px;max-width:220px;">
+                  {% if entry.anamnez_summary %}
+                    <span title="{{ entry.anamnez_summary }}">
+                      {{ entry.anamnez_summary|truncatechars:60 }}
+                    </span>
+                    {% if entry.risk_detected %}
+                      <span class="risk-badge">⚠ Risk</span>
+                    {% endif %}
+                  {% else %}
+                    <span style="color:var(--text-muted)">—</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <button class="btn btn-primary btn-sm"
+                          onclick="callSpecific({{ entry.id }})">
+                    📢 Çağır
+                  </button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /#doctor-panel -->
+  </div><!-- /.panel-content -->
+</div><!-- /.panel-layout -->
+
+<script src="{% static 'js/panel.js' %}"></script>
+<script>
+// Tablo görünürlüğü
+const tbl = document.getElementById('waiting-table');
+const tbdy = document.getElementById('waiting-table-body');
+if (tbdy && tbdy.rows.length > 0) {
+  if (tbl) tbl.style.display = '';
+}
+</script>
+</body>
+</html>

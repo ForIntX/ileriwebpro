@@ -1,0 +1,98 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anamnez — Kiosk</title>
+  <meta name="description" content="AI destekli anamnez sistemi — şikayetlerinizi doktora önceden bildirin.">
+  <link rel="stylesheet" href="{% static 'css/kiosk.css' %}">
+</head>
+<body>
+<div class="kiosk-page" style="height:100vh;overflow:hidden;">
+
+  <!-- Header -->
+  <header class="kiosk-header" style="flex-shrink:0;">
+    <div class="logo-icon">💬</div>
+    <div class="kiosk-header-text">
+      <h1>Anamnez Asistanı</h1>
+      <span class="subtitle">Şikayetlerinizi doktora önceden bildirebilirsiniz</span>
+    </div>
+    <div class="header-time">
+      <div class="time" id="kiosk-clock">--:--</div>
+    </div>
+  </header>
+
+  <!-- Risk Banner (gizli) -->
+  <div id="danger-banner" class="danger-banner hidden" style="margin:16px 24px 0;flex-shrink:0;">
+    <span style="font-size:22px">🚨</span>
+    <span>
+      Belirttiğiniz şikayetler <strong>acil değerlendirme</strong> gerektirebilir.
+      Lütfen en yakın sağlık personeline başvurunuz.
+    </span>
+  </div>
+
+  <!-- Özet Alanı (gizli, bitince gösterilir) -->
+  <div id="summary-area" class="hidden" style="margin:16px 24px 0;flex-shrink:0;">
+    <div class="info-banner" style="flex-direction:column;align-items:flex-start;gap:8px;">
+      <strong style="font-size:17px;">✅ Anamnez Özeti — Doktor Panelinize İletildi</strong>
+      <p id="summary-text" style="font-size:15px;line-height:1.6;color:var(--text-secondary);white-space:pre-wrap;"></p>
+    </div>
+  </div>
+
+  <!-- Chat Alanı -->
+  <div id="chat-container"
+       class="chat-container"
+       data-token="{{ token }}"
+       style="flex:1;overflow:hidden;display:flex;flex-direction:column;margin:16px 0 0;">
+
+    <!-- Mesajlar -->
+    <div class="chat-messages" id="chat-messages">
+      <!-- Karşılama -->
+      <div class="bubble bubble-assistant">
+        👋 Merhaba! Ben AI anamnez asistanınızım.
+        Şikayetlerinizi doktorunuza önceden iletmek için buradayım.
+        Lütfen başlamak için bekleyiniz…
+      </div>
+    </div>
+
+    <!-- Input Alanı -->
+    <div class="chat-input-area" id="chat-input-area">
+      <textarea
+        id="chat-input"
+        class="chat-input"
+        placeholder="Mesajınızı yazın… (Enter ile gönderin)"
+        rows="1"
+        disabled
+      ></textarea>
+      <button id="btn-send" class="btn-send" disabled aria-label="Gönder">
+        ➤
+      </button>
+      <button id="btn-finish"
+              class="btn-kiosk btn-outline-kiosk"
+              style="min-height:60px;font-size:14px;padding:0 20px;white-space:nowrap;"
+              disabled>
+        ✓ Bitir
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Alt Navigasyon -->
+  <div style="padding:12px 24px;background:#fff;border-top:1px solid var(--border);display:flex;gap:12px;flex-shrink:0;">
+    <a href="/kiosk/queue/{{ token }}/"
+       class="btn-kiosk btn-outline-kiosk"
+       style="min-height:48px;font-size:15px;padding:0 24px;">
+      ← Sıra Takibine Dön
+    </a>
+    <a href="/"
+       class="btn-kiosk btn-outline-kiosk"
+       style="min-height:48px;font-size:15px;padding:0 24px;">
+      🏠 Ana Sayfa
+    </a>
+  </div>
+
+</div>
+<script src="{% static 'js/kiosk.js' %}"></script>
+</body>
+</html>

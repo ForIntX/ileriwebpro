@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Giriş — Kiosk</title>
+  <link rel="stylesheet" href="{% static 'css/kiosk.css' %}">
+</head>
+<body>
+<div class="kiosk-page">
+  <header class="kiosk-header">
+    <div class="logo-icon">📷</div>
+    <div class="kiosk-header-text">
+      <h1>QR ile Giriş</h1>
+      <span class="subtitle">Kimlik kartınızı okutun</span>
+    </div>
+    <div class="header-time">
+      <div class="time" id="kiosk-clock">--:--</div>
+    </div>
+  </header>
+  <main class="kiosk-main">
+    <div class="card" style="max-width:600px;width:100%;text-align:center;">
+      <div class="card-body">
+        <div style="font-size:80px;margin-bottom:24px;">📷</div>
+        <h2 style="font-size:24px;font-weight:700;margin-bottom:12px;">QR Okuyucu</h2>
+        <p style="color:var(--text-secondary);font-size:17px;margin-bottom:32px;">
+          Bu özellik yakında aktif olacak.<br>
+          Şimdilik manuel girişi kullanabilirsiniz.
+        </p>
+        <a href="/kiosk/checkin/"
+           class="btn-kiosk btn-primary-kiosk"
+           style="max-width:400px;margin:0 auto;"
+           id="btn-go-manual">
+          <span class="btn-icon">📋</span>
+          Manuel Girişe Git
+        </a>
+        <div style="margin-top:16px;">
+          <a href="/" class="btn-kiosk btn-outline-kiosk"
+             style="min-height:52px;font-size:16px;padding:12px 32px;max-width:400px;margin:0 auto;"
+             id="btn-back">
+            ← Ana Sayfaya Dön
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer class="kiosk-footer">Hastane Kiosk Sistemi 🔒</footer>
+</div>
+<script src="{% static 'js/kiosk.js' %}"></script>
+</body>
+</html>

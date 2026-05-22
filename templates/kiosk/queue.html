@@ -1,0 +1,117 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sıra Takibi — Kiosk</title>
+  <meta name="description" content="Hastane sıra takibi — sıranızın durumunu canlı izleyin.">
+  <link rel="stylesheet" href="{% static 'css/kiosk.css' %}">
+</head>
+<body>
+<div class="kiosk-page" id="queue-page">
+
+  <!-- Header -->
+  <header class="kiosk-header">
+    <div class="logo-icon">🔍</div>
+    <div class="kiosk-header-text">
+      <h1>Sıra Takibi</h1>
+      <span class="subtitle">Sıranız her 5 saniyede bir güncelleniyor</span>
+    </div>
+    <div class="header-time">
+      <div class="time" id="kiosk-clock">--:--</div>
+      <div class="date" id="kiosk-date"></div>
+    </div>
+  </header>
+
+  <!-- Ana İçerik -->
+  <main class="kiosk-main" style="gap:24px;" id="queue-display" data-token="{{ token }}">
+
+    <!-- Çağrıldı Overlay (gizli) -->
+    <div id="called-overlay" class="called-overlay hidden" style="width:100%;max-width:700px;text-align:center;">
+      <div style="font-size:80px;margin-bottom:20px;animation:bounce-number .6s ease infinite alternate;">📢</div>
+      <div class="called-title">SIRANIZ GELDİ!</div>
+      {% if room %}
+      <div class="called-room">Lütfen <strong>Oda {{ room }}</strong>'e geçiniz.</div>
+      {% else %}
+      <div class="called-room">Lütfen ilgili odaya geçiniz.</div>
+      {% endif %}
+      <div style="margin-top:32px;font-size:20px;opacity:.8">
+        Sağlıklı günler dileriz 💙
+      </div>
+    </div>
+
+    <!-- Bekleme Bölümü -->
+    <div id="waiting-section" style="width:100%;max-width:700px;display:flex;flex-direction:column;gap:20px;">
+
+      <!-- Sıra Numarası Kartı -->
+      <div class="card">
+        <div class="card-body" style="display:flex;align-items:center;gap:40px;flex-wrap:wrap;">
+          <div class="queue-number-display" style="flex:1;min-width:180px;">
+            <span class="queue-number-label">Sıra Numaranız</span>
+            <span class="queue-number-value" id="queue-number">{{ initial_data.queue_number }}</span>
+          </div>
+          <div style="flex:1;min-width:200px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+            <span style="font-size:15px;font-weight:600;color:var(--text-secondary);">Önünüzdeki Kişi</span>
+            <span class="remaining-count many" id="remaining-count">{{ initial_data.remaining_count }}</span>
+            <div id="status-badge" class="status-badge waiting">
+              <span class="dot"></span>
+              Bekliyor
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detay Bilgiler -->
+      <div class="card">
+        <div class="card-body" style="padding:24px 32px;">
+          <div class="info-row">
+            <div class="info-icon">🏥</div>
+            <span class="info-key">Poliklinik</span>
+            <span class="info-val" id="polyclinic-name">{{ initial_data.polyclinic }}</span>
+          </div>
+          <div class="info-row">
+            <div class="info-icon">👨‍⚕️</div>
+            <span class="info-key">Doktor</span>
+            <span class="info-val" id="doctor-name">{{ initial_data.doctor_name|default:"—" }}</span>
+          </div>
+          <div class="info-row">
+            <div class="info-icon">🚪</div>
+            <span class="info-key">Oda</span>
+            <span class="info-val" id="room-number">{{ initial_data.room|default:"—" }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Anamnez Butonu -->
+      <a href="/kiosk/anamnez/{{ token }}/"
+         class="btn-kiosk btn-secondary-kiosk w-full"
+         id="btn-to-anamnez"
+         style="min-height:70px;">
+        <span class="btn-icon">💬</span>
+        <div>
+          <div>Anamnez Doldur</div>
+          <div style="font-size:14px;font-weight:400;opacity:.8">Doktora önceden bilgi ver</div>
+        </div>
+      </a>
+
+      <!-- Ana Sayfa -->
+      <a href="/"
+         class="btn-kiosk btn-outline-kiosk w-full"
+         id="btn-back-home"
+         style="min-height:56px;font-size:16px;">
+        🏠 Ana Sayfaya Dön
+      </a>
+
+    </div>
+
+  </main>
+
+  <footer class="kiosk-footer">
+    TC kimlik numaranız bu ekranda gösterilmez. 🔒
+  </footer>
+
+</div>
+<script src="{% static 'js/kiosk.js' %}"></script>
+</body>
+</html>

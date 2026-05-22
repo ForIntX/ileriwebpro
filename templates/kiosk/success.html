@@ -1,0 +1,129 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sıranız Alındı — Kiosk</title>
+  <meta name="description" content="Sıranız başarıyla alındı. Sıra takibi ve anamnez işlemleri için bu ekranı kullanın.">
+  <link rel="stylesheet" href="{% static 'css/kiosk.css' %}">
+  <style>
+    .pulse-ring {
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 4px solid rgba(16,185,129,.5);
+      animation: ring-pulse 1.5s ease-out infinite;
+    }
+    @keyframes ring-pulse {
+      from { transform: scale(1); opacity: .8; }
+      to   { transform: scale(1.4); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+<div class="kiosk-page">
+
+  <!-- Header -->
+  <header class="kiosk-header">
+    <div class="logo-icon">✅</div>
+    <div class="kiosk-header-text">
+      <h1>Sıranız Alındı!</h1>
+      <span class="subtitle">Sıra numaranızı ve bilgilerinizi aşağıda görebilirsiniz</span>
+    </div>
+    <div class="header-time">
+      <div class="time" id="kiosk-clock">--:--</div>
+      <div class="date" id="kiosk-date"></div>
+    </div>
+  </header>
+
+  <!-- İçerik -->
+  <main class="kiosk-main">
+    <div class="success-page-wrapper">
+
+      <!-- Başarı İkonu -->
+      <div style="position:relative;display:flex;align-items:center;justify-content:center;">
+        <div class="pulse-ring"></div>
+        <div class="success-icon">✓</div>
+      </div>
+
+      <!-- Sıra Numarası -->
+      <div class="card" style="width:100%;text-align:center;">
+        <div class="card-body">
+          <div class="queue-number-display">
+            <span class="queue-number-label">Sıra Numaranız</span>
+            <span class="queue-number-value">{{ queue_number }}</span>
+          </div>
+
+          <!-- Bilgiler -->
+          <div style="margin-top:24px;border-top:1px solid #f1f5f9;padding-top:24px;">
+            <div class="info-row">
+              <div class="info-icon">🏥</div>
+              <span class="info-key">Poliklinik</span>
+              <span class="info-val">{{ polyclinic }}</span>
+            </div>
+            {% if doctor %}
+            <div class="info-row">
+              <div class="info-icon">👨‍⚕️</div>
+              <span class="info-key">Doktor</span>
+              <span class="info-val">Dr. {{ doctor }}</span>
+            </div>
+            {% endif %}
+            {% if room %}
+            <div class="info-row">
+              <div class="info-icon">🚪</div>
+              <span class="info-key">Oda</span>
+              <span class="info-val">{{ room }}</span>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Uyarı -->
+          <div class="info-banner" style="margin-top:20px;">
+            <span style="font-size:20px">⏳</span>
+            Sıranız geldiğinde ekranda ve sesli olarak bilgilendirileceksiniz.
+          </div>
+        </div>
+      </div>
+
+      <!-- Aksiyon Butonları -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;width:100%;">
+        <a href="/kiosk/queue/{{ token }}/"
+           class="btn-kiosk btn-primary-kiosk"
+           id="btn-track-queue">
+          <span class="btn-icon">🔍</span>
+          <div>
+            <div>Sıramı Takip Et</div>
+            <div style="font-size:13px;font-weight:400;opacity:.8">Canlı güncelleme</div>
+          </div>
+        </a>
+        <a href="/kiosk/anamnez/{{ token }}/"
+           class="btn-kiosk btn-secondary-kiosk"
+           id="btn-anamnez">
+          <span class="btn-icon">💬</span>
+          <div>
+            <div>Anamnez Doldur</div>
+            <div style="font-size:13px;font-weight:400;opacity:.8">AI asistan ile</div>
+          </div>
+        </a>
+      </div>
+
+      <!-- Ana Sayfaya Dön -->
+      <a href="/" 
+         class="btn-kiosk btn-outline-kiosk w-full" 
+         style="min-height:56px;font-size:16px;"
+         id="btn-home">
+        🏠 Ana Sayfaya Dön
+      </a>
+
+    </div>
+  </main>
+
+  <footer class="kiosk-footer">
+    Sağlıklı günler dileriz 💙
+  </footer>
+
+</div>
+<script src="{% static 'js/kiosk.js' %}"></script>
+</body>
+</html>

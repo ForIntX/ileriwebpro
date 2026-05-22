@@ -1,0 +1,34 @@
+# =========================
+# İşletim Sistemi
+# =========================
+.DS_Store
+*~
+*.swp
+*.swo
+
+# =========================
+# IDE / Editör (VS Code vb.)
+# =========================
+.vscode/
+.idea/
+*.suo
+*.sln
+*.sw?
+
+# =========================
+# Python & Django
+# =========================
+# Önbellek ve sanal ortamlar
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+.env
+
+# Django Spesifik Dosyalar
+db.sqlite3
+media/
+staticfiles/

@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Numaratör Ekranı — Hastane</title>
+  <meta name="description" content="Hastane numaratör ekranı — son çağrılan hastalar ve sıra bilgisi.">
+  <link rel="stylesheet" href="{% static 'css/panel.css' %}">
+</head>
+<body>
+<div class="display-page" id="queue-display-screen">
+
+  <!-- Header -->
+  <div class="display-header">
+    <div>
+      <h1>🏥 Hasta Çağırma Ekranı</h1>
+      <div style="font-size:14px;opacity:.6;margin-top:4px;">
+        Son 5 çağrı gösterilmektedir
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:32px;">
+      <div class="live-indicator">
+        <div class="live-dot"></div>
+        Canlı — Her 5 saniyede güncellenir
+      </div>
+      <div style="text-align:right;">
+        <div class="display-clock" id="display-clock">--:--:--</div>
+        <div style="font-size:12px;opacity:.5;margin-top:2px;" id="display-date"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tablo Başlığı -->
+  <div class="display-body" style="padding-bottom:0;">
+    <div class="display-header-row">
+      <div class="display-header-col">Sıra No</div>
+      <div class="display-header-col">Hasta</div>
+      <div class="display-header-col">Poliklinik</div>
+      <div class="display-header-col">Doktor</div>
+      <div class="display-header-col">Oda / Saat</div>
+    </div>
+  </div>
+
+  <!-- Satırlar -->
+  <div class="display-body" id="display-rows" style="gap:12px;">
+    {% for call in recent_calls %}
+    <div class="display-row{% if forloop.first %} flash{% endif %}">
+      <div class="display-col">
+        <div class="display-col-label">Sıra No</div>
+        <div class="display-col-value queue-num{% if forloop.first %} new-call{% endif %}">
+          {{ call.queue_number }}
+        </div>
+      </div>
+      <div class="display-col">
+        <div class="display-col-label">Hasta</div>
+        <div class="display-col-value" style="font-size:20px;">{{ call.patient.full_name }}</div>
+      </div>
+      <div class="display-col">
+        <div class="display-col-label">Poliklinik</div>
+        <div class="display-col-value" style="font-size:18px;">{{ call.polyclinic.name }}</div>
+      </div>
+      <div class="display-col">
+        <div class="display-col-label">Doktor</div>
+        <div class="display-col-value" style="font-size:18px;">
+          {% if call.doctor %}Dr. {{ call.doctor.full_name }}{% else %}—{% endif %}
+        </div>
+      </div>
+      <div class="display-col">
+        <div class="display-col-label">Oda</div>
+        <div class="display-col-value" style="font-size:24px;">
+          {% if call.doctor %}{{ call.doctor.room_number }}{% else %}—{% endif %}
+        </div>
+        {% if call.called_at %}
+        <div class="display-time">{{ call.called_at|time:"H:i" }}</div>
+        {% endif %}
+      </div>
+    </div>
+    {% empty %}
+    <div style="text-align:center;padding:80px;color:rgba(255,255,255,.3);font-size:20px;">
+      Henüz çağrı yapılmadı.
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Footer -->
+  <div class="display-footer">
+    <div>Hastane Kiosk & Numaratör Sistemi</div>
+    <div style="display:flex;align-items:center;gap:16px;">
+      <a href="/panel/" style="color:rgba(255,255,255,.4);text-decoration:none;font-size:13px;">
+        Doktor Paneli →
+      </a>
+      <a href="/" style="color:rgba(255,255,255,.4);text-decoration:none;font-size:13px;">
+        Kiosk →
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<script src="{% static 'js/panel.js' %}"></script>
+<script>
+// Tarih güncelle
+(function() {
+  const el = document.getElementById('display-date');
+  if (el) {
+    el.textContent = new Date().toLocaleDateString('tr-TR', {
+      weekday: 'long', day: 'numeric', month: 'long'
+    });
+  }
+})();
+</script>
+</body>
+</html>
